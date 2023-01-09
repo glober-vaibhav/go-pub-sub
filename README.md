@@ -1,2 +1,11 @@
 # go-pub-sub
 Implementing a simple pub/sub design pattern in Go
+
+
+This code defines a **`Agent`** struct that implements a simple pub/sub agent in Golang. The **`Agent`** struct has a **`mu`** field of type **`sync.Mutex`**, a **`subs`** field of type **`map[string][]chan string`**, a **`quit`** field of type **`chan struct{}`**, and a **`closed`** field of type **`bool`**. The **`mu`** field is used to protect access to the **`subs`** and **`closed`** fields using a mutex, which is a synchronization mechanism that allows only one goroutine to access these fields at a time. The **`subs`** field is a map that holds a list of channels for each topic, allowing subscribers to receive messages published to that topic. The **`quit`** field is a channel that is closed when the agent is closed, allowing goroutines that are blocked on the channel to unblock and exit. The **`closed`** field is a flag that indicates whether the agent has been closed.
+
+The **`NewAgent`** function creates and returns a new **`Agent`** struct. This function initializes the **`subs`** field as a new empty map, and the **`quit`** field as a new channel. The **`Publish`** method allows a message to be published to a topic. This method acquires a lock on the **`mu`** mutex, and then sends the message to all channels in the **`subs`** map for the specified topic. The **`Subscribe`** method allows a goroutine to subscribe to a topic. This method acquires a lock on the **`mu`** mutex, and then creates a new channel and adds it to the list of channels for the specified topic in the **`subs`** map. This method returns the newly-created channel, allowing the subscriber to receive messages published to the topic.
+
+The **`Close`** method closes the agent and all channels in the **`subs`** map. This method acquires a lock on the **`mu`** mutex, sets the **`closed`** flag to **`true`**, closes the **`quit`** channel, and then closes all channels in the **`subs`** map. This allows goroutines that are blocked on these channels to unblock and exit.
+
+The **`main`** function creates a new agent, subscribes to the "foo" topic, publishes a message to the "foo" topic, receives and prints the message, and then closes the agent.
